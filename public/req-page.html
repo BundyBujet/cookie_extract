@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Requirement Page</title>
+    <script src="../src/renderer/tailwind.js"></script>
+  </head>
+  <body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+    <div
+      x-data="requirementsCheck"
+      class="flex flex-col items-center justify-center space-y-4"
+    >
+      <h1 class="text-2xl font-bold mb-6">
+        Check Requirements for Cookie Extract
+      </h1>
+      <button
+        class="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+        :class="checkRequirementsSuccess ? 'hidden' : ''"
+        @click="checkRequirements"
+      >
+        Check Requirements
+      </button>
+
+      <p
+        class="text-green-500 mt-4 text-center"
+        :class="{ 'text-green-500': checkRequirementsSuccess, 'text-red-500': !checkRequirementsSuccess }"
+        x-text="checkRequirementsMessage"
+      ></p>
+    </div>
+    <script defer src="../src/renderer/alpine.min.js"></script>
+    <script defer src="../src/renderer/alpine-ui.min.js"></script>
+    <script defer src="../src/renderer/alpine-persist.min.js"></script>
+    <script defer src="../src/renderer/alpine-mask.min.js"></script>
+    <script defer src="../src/renderer/alpine-focus.min.js"></script>
+    <script defer src="../src/renderer/alpine-collaspe.min.js"></script>
+    <script src="../src/renderer/index.js"></script>
+  </body>
+</html>

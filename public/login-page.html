@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Login Page with Validation</title>
+    <script src="../src/renderer/tailwind.js"></script>
+  </head>
+  <body class="bg-gray-100 flex items-center justify-center min-h-screen p-6">
+    <div
+      x-data="loginForm"
+      class="w-full max-w-md bg-white p-8 rounded-lg shadow-md"
+    >
+      <h2 class="text-2xl font-bold mb-6 text-center">Login</h2>
+
+      <form @submit.prevent="validateForm">
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="email" class="block text-sm font-medium text-gray-700"
+            >Email</label
+          >
+          <input
+            type="email"
+            id="email"
+            x-model="email"
+            class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            @input="validateEmail"
+          />
+          <p
+            x-show="emailError"
+            class="text-sm text-red-500 mt-1"
+            x-text="emailError"
+          ></p>
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-6">
+          <label for="password" class="block text-sm font-medium text-gray-700"
+            >Password</label
+          >
+          <input
+            type="password"
+            id="password"
+            x-model="password"
+            class="w-full mt-1 p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400"
+            @input="validatePassword"
+          />
+          <p
+            x-show="passwordError"
+            class="text-sm text-red-500 mt-1"
+            x-text="passwordError"
+          ></p>
+        </div>
+
+        <!-- Submit Button -->
+        <button
+          type="submit"
+          class="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none"
+          :class="isDisabled ? 'opacity-50 cursor-not-allowed' : ''"
+          :disabled="isDisabled"
+          @click="validateForm"
+        >
+          Login
+        </button>
+
+        <!-- Success Message -->
+        <p
+          x-show="formSuccess"
+          class="text-green-500 mt-4 text-center"
+          :class="{ 'text-green-500': loginSuccess, 'text-red-500': !loginSuccess }"
+          x-text="formSuccess"
+        ></p>
+      </form>
+    </div>
+    <script defer src="../src/renderer/alpine.min.js"></script>
+    <script defer src="../src/renderer/alpine-ui.min.js"></script>
+    <script defer src="../src/renderer/alpine-persist.min.js"></script>
+    <script defer src="../src/renderer/alpine-mask.min.js"></script>
+    <script defer src="../src/renderer/alpine-focus.min.js"></script>
+    <script defer src="../src/renderer/alpine-collaspe.min.js"></script>
+    <script src="../src/renderer/index.js"></script>
+  </body>
+</html>
