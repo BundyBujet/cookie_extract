@@ -21,13 +21,13 @@ class BrowserInit {
 
   // Initialize multiple browser instances
   async initBrowsers() {
-    const { headless, args, instances } = this.options;
+    const { headless, args, instances,executablePath } = this.options;
 
     for (let i = 0; i < instances; i++) {
       const browser = await puppeteer.launch({
         headless,
         args,
-        executablePath: this.getChromeExecutablePath(),
+        executablePath: executablePath,
       });
 
       this.browsers.push(browser);

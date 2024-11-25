@@ -1,14 +1,16 @@
 const fs = require("fs");
 const { ipcMain, dialog } = require("electron");
-const { isChromeInstalled } = require("../../utils/checkRequirements");
+const { getChromePath } = require("../../utils/checkRequirements");
 const BrowserInit = require("../../services/Browser.service");
 const readCSVFile = require("../../utils/readCSVFile");
+
+let getChromeExecutablePath;
 
 // Handle file selection dialog
 ipcMain.on("open-file-dialog", (event) => {
   dialog
     .showOpenDialog({
-      filters: [{ name: "CSV Files", extensions: ["csv"] }],
+      filters: [{ name: "txt Files", extensions: ["txt"] }],
       properties: ["openFile"],
     })
     .then((result) => {
@@ -78,9 +80,10 @@ ipcMain.on("send-processInfo", async (event, processInfo) => {
       "--disable-notifications",
     ],
     instances: process,
+    executablePath:getChromeExecutablePath,
     cleanCache: true,
   };
-  if (isChromeInstalled()) {
+  if (getChromePath()) {
     try {
       const browserInit = new BrowserInit(options);
       await browserInit.initBrowsers();
@@ -94,9 +97,16 @@ ipcMain.on("send-processInfo", async (event, processInfo) => {
 
 // Handle requirements check
 ipcMain.on("send-requirements-check", async (event) => {
-  // console.log("Sending requirements check");
-  if (isChromeInstalled()) {
-    return event.reply("requirements-check-result", { success: true });
+  try {
+    
+    // console.log("Sending requirements check");
+    const chromePaths = getChromePath();
+    if (chromePaths) {
+      getChromeExecutablePath = chromePaths
+      return event.reply("requirements-check-result", { success: true });
+    }
+    return event.reply("requirements-check-result", { success: false });
+  } catch (error) {
+    console.log(error)  
   }
-  return event.reply("requirements-check-result", { success: false });
 });

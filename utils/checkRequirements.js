@@ -1,8 +1,8 @@
 const fs = require("fs");
 const path = require("path");
 
-// Function to check if Chrome is installed
-function isChromeInstalled() {
+// Function to check if Chrome is installed and return the file path
+function getChromePath() {
   const platform = process.platform;
 
   let chromePaths = [];
@@ -26,10 +26,16 @@ function isChromeInstalled() {
     ];
   }
 
-  // Check if any of the paths exist
-  return chromePaths.some((chromePath) => fs.existsSync(chromePath));
+  // Check if any of the paths exist and return the first valid one
+  for (let i = 0; i < chromePaths.length; i++) {
+    if (fs.existsSync(chromePaths[i])) {
+      return chromePaths[i]; // Return the first valid Chrome path
+    }
+  }
+
+  return null; // Return null if no Chrome path is found
 }
 
 module.exports = {
-  isChromeInstalled,
+  getChromePath,
 };

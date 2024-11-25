@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "main.js",
   "scripts": {
-    "start": "nodemon --exec electron . start",
+    "start": "nodemon --exec electron . --trace-warnings start",
     "build": "@electron-packager . --overwrite cookie_extract --platform=win32 --arch=x64 --out=dist/ --icon=assets/icon.ico --asar --prune=true --version-string.CompanyName=CE --version-string.FileDescription=CE --version-string.ProductName=\"cookie_extract\""
   },
   "keywords": [],
