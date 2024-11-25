@@ -139,3 +139,6 @@ dist
 # achives
 *.zip
 *.rar
+
+#build 
+/dist
