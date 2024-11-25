@@ -3,7 +3,6 @@ const { ipcMain, dialog } = require("electron");
 const { isChromeInstalled } = require("../../utils/checkRequirements");
 const BrowserInit = require("../../services/Browser.service");
 const readCSVFile = require("../../utils/readCSVFile");
-const { startBrowser } = require("../../utils/browserInit");
 
 // Handle file selection dialog
 ipcMain.on("open-file-dialog", (event) => {
@@ -14,7 +13,7 @@ ipcMain.on("open-file-dialog", (event) => {
     })
     .then((result) => {
       if (!result.canceled && result.filePaths.length > 0) {
-        console.log(result.filePaths[0]);
+        // console.log(result.filePaths[0]);
         const fileName = result.filePaths[0].split("\\");
         event.reply("file-selected", {
           fileName: fileName[fileName.length - 1],
@@ -27,9 +26,41 @@ ipcMain.on("open-file-dialog", (event) => {
 });
 
 // Handle login credentials
-ipcMain.on("send-credentials", (event, credentials) => {
-  // console.log(credentials);
-  return event.reply("login-result", { success: true });
+ipcMain.on("send-credentials", async (event, credentials) => {
+  const { email, password } = credentials;
+  try {
+    const response = await fetch(
+      "https://www.reachrapid.net/api/auth/app_login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+
+    if (!response.ok) {
+      const errorMessage = await response.json();
+
+      return event.reply("login-result", {
+        success: false,
+        message: errorMessage,
+      });
+    }
+
+    const data = await response.json();
+
+    if (data?.data) {
+      return event.reply("login-result", { success: true });
+    }
+  } catch (error) {
+    console.log(error);
+    event.reply("login-result", { success: false, message: error.message });
+  }
 });
 
 // Handle process info
@@ -38,7 +69,7 @@ ipcMain.on("send-processInfo", async (event, processInfo) => {
   const users = await readCSVFile(filePath);
   const url = "https://www.facebook.com/login";
   const options = {
-    headless: false,
+    headless: "new",
     args: [
       "--no-sandbox",
       "--incognito",
@@ -54,41 +85,16 @@ ipcMain.on("send-processInfo", async (event, processInfo) => {
       const browserInit = new BrowserInit(options);
       await browserInit.initBrowsers();
       await browserInit.processUsers(url, users);
-      const cookies = await browserInit.closeAndDisplayCookies();
-      const failedUsers = await browserInit.closeAndDisplayFailedUsers();
-
-      //formate the array of successful cookies to a string
-      if (cookies.length !== 0) {
-        const formattedUsers = cookies
-          .map((entry) => {
-            return `${entry.email},${entry.password},${entry.token},${entry.cookies}`;
-          })
-          .join("\n");
-
-        //write successful cookies to a file with deno
-
-        fs.writeFileSync("cookies.csv", formattedUsers);
-      }
-
-      if (failedUsers.length !== 0) {
-        //formate the array of failed users to a string
-        const formattedFailedUsers = failedUsers
-          .map((entry) => {
-            return `${entry.UserCredentials.email},${entry.UserCredentials.password},${entry.loginStatusCode}`;
-          })
-          .join("\n");
-        //write failed users to a file with deno
-        fs.writeFileSync("failed.csv", formattedFailedUsers);
-      }
     } catch (error) {
       console.log(error);
     }
   }
+  return event.reply("process-info-result", { success: true });
 });
 
 // Handle requirements check
 ipcMain.on("send-requirements-check", async (event) => {
-  console.log("Sending requirements check");
+  // console.log("Sending requirements check");
   if (isChromeInstalled()) {
     return event.reply("requirements-check-result", { success: true });
   }

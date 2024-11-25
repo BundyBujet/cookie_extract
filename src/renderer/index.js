@@ -3,8 +3,8 @@ const delay = (seconds) =>
 
 document.addEventListener("alpine:init", () => {
   Alpine.data("loginForm", () => ({
-    email: "test@gmail.com",
-    password: "123456",
+    email: "",
+    password: "",
     emailError: "",
     passwordError: "",
     formSuccess: "",
@@ -44,10 +44,14 @@ document.addEventListener("alpine:init", () => {
           if (data.success) {
             this.formSuccess = "Successfully logged in.";
             this.loginSuccess = true;
+            this.isDisabled = false;
+
             window.location.href = "req-page.html";
           } else {
-            this.formSuccess = "Invalid credentials.";
+            const errorMessage = data.message?.errors;
+            this.formSuccess = errorMessage;
             this.loginSuccess = false;
+            this.isDisabled = false;
           }
         });
       }
@@ -88,7 +92,7 @@ document.addEventListener("alpine:init", () => {
     selectFile() {
       window.electronAPI.openFileDialog();
       window.electronAPI.fileSelected((event, data) => {
-        console.log("Data:", data);
+        // console.log("Data:", data);
         this.filePath = data?.path;
         this.fileName = data?.fileName;
       });
@@ -118,6 +122,18 @@ document.addEventListener("alpine:init", () => {
         window.electronAPI.sendProcessInfo({
           filePath: this.filePath,
           process: this.process,
+        });
+        window.electronAPI.onProcessInfoResult((event, data) => {
+          // console.log("Data:", data);
+          if (data.success) {
+            this.formSuccess = "processInfo ended successfully.";
+            this.loginSuccess = true;
+            this.isDisabled = false;
+          } else {
+            this.formSuccess = "Something went wrong.";
+            this.loginSuccess = false;
+            this.isDisabled = false;
+          }
         });
       }
     },

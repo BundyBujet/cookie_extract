@@ -3,13 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>File Upload with Tailwind CSS</title>
+    <title>Cookie Extract</title>
     <script src="../src/renderer/tailwind.js"></script>
   </head>
-  <body class="bg-gray-100 min-h-screen flex items-center justify-center p-6">
+  <body
+    class="bg-gray-100 min-h-screen flex items-center justify-center p-6 select-none"
+  >
     <!-- From and select CSV file -->
     <form x-data="selectCSVFile" @submit.prevent="selectCSVFileForm">
-      <div>
+      <div class="w-[350px]">
         <div class="flex flex-col items-center justify-center space-y-4">
           <h1>Select and Process a CSV File</h1>
           <button
@@ -73,7 +75,7 @@
             :disabled="isDisabled"
             @click="selectCSVFileForm"
           >
-            Login
+            Start Extraction
           </button>
         </div>
         <!-- Success Message -->

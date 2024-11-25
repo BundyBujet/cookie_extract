@@ -1,3 +1,4 @@
+const fs = require("fs");
 const puppeteer = require("puppeteer-extra");
 const StealthPlugin = require("puppeteer-extra-plugin-stealth");
 const anonymousPlugin = require("puppeteer-extra-plugin-anonymize-ua");
@@ -54,7 +55,9 @@ class BrowserInit {
     await page.click("button[type='submit']");
     await page.waitForNavigation();
 
+    await this.delay(2);
     const { statusCode, isAuthLogin } = await checkLoginStatus(page);
+    console.log("Status code:", { statusCode, isAuthLogin });
     await this.delay(2);
 
     if (statusCode === "AUTOMATION_NOTICE" && isAuthLogin) {
@@ -68,10 +71,10 @@ class BrowserInit {
 
     if (!isAuthLogin) {
       const cookies = await page.cookies();
-      this.failedUsers.push({
-        UserCredentials: user,
-        loginStatusCode: statusCode,
-      });
+      fs.appendFileSync(
+        "failed.csv",
+        `${user.email},${user.password},${statusCode}\n`
+      );
 
       await this.clearSessionData(page, cookies);
       return;
@@ -79,7 +82,6 @@ class BrowserInit {
 
     const cookies = await page.cookies();
     const formattedCookies = this.cookiesFormatter(cookies);
-    console.log(formattedCookies);
     const token = await getBusinessToken(formattedCookies);
 
     if (!token) {
@@ -87,12 +89,10 @@ class BrowserInit {
       return;
     }
 
-    this.cookiesList.push({
-      email,
-      password,
-      token: token || "N/A",
-      cookies: formattedCookies,
-    });
+    fs.appendFileSync(
+      "cookies.csv",
+      `${email},${password},${token || "N/A"},${formattedCookies}\n`
+    );
 
     await this.clearSessionData(page, cookies);
   }
@@ -116,10 +116,10 @@ class BrowserInit {
             await this.getUserCookies(page, url, user);
           } catch (userError) {
             console.error(`Error processing user: ${userError}`);
-            this.failedUsers.push({
-              UserCredentials: user,
-              loginStatusCode: "OPERATION_FAILED",
-            });
+            fs.appendFileSync(
+              "failed.csv",
+              `${user.email},${user.password},${"OPERATION_FAILED"}\n`
+            );
           }
         }
 

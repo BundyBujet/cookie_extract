@@ -9,6 +9,8 @@ contextBridge.exposeInMainWorld("electronAPI", {
   sendProcessInfo: (processInfo) =>
     ipcRenderer.send("send-processInfo", processInfo),
   sendRequirementsCheck: () => ipcRenderer.send("send-requirements-check"),
+  onProcessInfoResult: (callback) =>
+    ipcRenderer.on("process-info-result", callback),
   onRequirementsCheckResult: (callback) =>
     ipcRenderer.on("requirements-check-result", callback),
 });
